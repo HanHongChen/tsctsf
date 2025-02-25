@@ -14,10 +14,10 @@ import (
 
 	"bitbucket.org/free5gc-team/openapi"
 	"github.com/HanHongChen/bitbucket-openapi/models"
+	"github.com/HanHongChen/tsctsf/internal/logger"
+	"github.com/HanHongChen/tsctsf/internal/sbi/producer"
 	"github.com/free5gc/util/httpwrapper"
 	"github.com/gin-gonic/gin"
-	"github.com/yashihh/tsctsf/internal/logger"
-	"github.com/yashihh/tsctsf/internal/sbi/producer"
 )
 
 // CreateIndividualTimeSynchronizationExposureConfiguration - Craete a new Individual Time Synchronization Exposure Configuration

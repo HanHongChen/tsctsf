@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/HanHongChen/bitbucket-openapi/models"
-	"github.com/yashihh/tsctsf/internal/logger"
-	"github.com/yashihh/tsctsf/util"
+	"github.com/HanHongChen/tsctsf/internal/logger"
+	"github.com/HanHongChen/tsctsf/util"
 )
 
 func AppSessionUpdate_PMIC(portManCont models.PortManagementContainer,

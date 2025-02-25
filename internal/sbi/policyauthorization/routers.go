@@ -15,8 +15,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/HanHongChen/tsctsf/internal/logger"
 	logger_util "github.com/free5gc/util/logger"
-	"github.com/yashihh/tsctsf/internal/logger"
 )
 
 // Route is the information for every URI.

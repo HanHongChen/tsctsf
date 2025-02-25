@@ -4,7 +4,7 @@ import (
 	"encoding/binary"
 
 	"github.com/HanHongChen/bitbucket-openapi/models"
-	tsctsf_context "github.com/yashihh/tsctsf/internal/context"
+	tsctsf_context "github.com/HanHongChen/tsctsf/internal/context"
 )
 
 const (

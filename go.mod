@@ -1,9 +1,11 @@
 module github.com/HanHongChen/tsctsf
 
-go 1.18
+go 1.21
+
+// toolchain go1.21.8
 
 require (
-	github.com/HanHongChen/bitbucket-openapi v0.0.0-20250225143130-04e3d2759446
+	github.com/HanHongChen/bitbucket-openapi v0.0.0-20250225154822-b02f8b107d31
 	// github.com/HanHongChen/bitbucket-openapi v0.0.0-20240920073207-f5f8afe35d8c
 	// bitbucket.org/free5gc-team/util v0.0.0-20230511075254-e9f72181c776
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
@@ -17,8 +19,9 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 )
 
+require bitbucket.org/free5gc-team/openapi v0.0.0-00010101000000-000000000000
+
 require (
-	github.com/HanHongChen/bitbucket-openapi v0.0.0-20250225143130-04e3d2759446 // indirect
 	github.com/antihax/optional v1.0.0 // indirect
 	github.com/bytedance/sonic v1.11.6 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
@@ -32,7 +35,7 @@ require (
 	github.com/go-playground/validator/v10 v10.20.0 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/golang-jwt/jwt v3.2.1+incompatible // indirect
-	github.com/golang/protobuf v1.5.0 // indirect
+	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
 	github.com/h2non/parth v0.0.0-20190131123155-b4df798d6542 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
@@ -54,7 +57,6 @@ require (
 	golang.org/x/oauth2 v0.21.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
-	google.golang.org/appengine v1.6.6 // indirect
 	google.golang.org/protobuf v1.34.0 // indirect
 	gopkg.in/h2non/gock.v1 v1.1.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
@@ -63,3 +65,5 @@ require (
 // replace github.com/HanHongChen/bitbucket-openapi => /home/cslab/Desktop/chh/bitbucket/openapi
 
 replace github.com/free5gc/openapi => /home/cslab/Desktop/chh/openapi
+
+replace bitbucket.org/free5gc-team/openapi => /home/cslab/Desktop/chh/bitbucket/openapi // Add this if not alreadygithub.com/

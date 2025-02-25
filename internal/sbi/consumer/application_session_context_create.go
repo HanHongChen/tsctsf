@@ -6,9 +6,9 @@ import (
 	"net/url"
 
 	"github.com/HanHongChen/bitbucket-openapi/models"
-	tsctsf_context "github.com/yashihh/tsctsf/internal/context"
-	"github.com/yashihh/tsctsf/internal/logger"
-	"github.com/yashihh/tsctsf/util"
+	tsctsf_context "github.com/HanHongChen/tsctsf/internal/context"
+	"github.com/HanHongChen/tsctsf/internal/logger"
+	"github.com/HanHongChen/tsctsf/util"
 )
 
 // Npcf_PolicyAuthorization_create service 4.2.2.2

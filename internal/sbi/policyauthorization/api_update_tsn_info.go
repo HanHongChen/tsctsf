@@ -16,9 +16,9 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/HanHongChen/bitbucket-openapi/models"
+	"github.com/HanHongChen/tsctsf/internal/logger"
+	"github.com/HanHongChen/tsctsf/internal/sbi/producer"
 	"github.com/free5gc/util/httpwrapper"
-	"github.com/yashihh/tsctsf/internal/logger"
-	"github.com/yashihh/tsctsf/internal/sbi/producer"
 )
 
 // HTTPPostTsnNewBridge - Receive new bridge of TSN related

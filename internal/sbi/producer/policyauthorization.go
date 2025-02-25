@@ -5,11 +5,11 @@ import (
 
 	"github.com/HanHongChen/bitbucket-openapi/models"
 
+	tsctsf_context "github.com/HanHongChen/tsctsf/internal/context"
+	"github.com/HanHongChen/tsctsf/internal/logger"
+	"github.com/HanHongChen/tsctsf/internal/sbi/consumer"
+	"github.com/HanHongChen/tsctsf/util"
 	"github.com/free5gc/util/httpwrapper"
-	tsctsf_context "github.com/yashihh/tsctsf/internal/context"
-	"github.com/yashihh/tsctsf/internal/logger"
-	"github.com/yashihh/tsctsf/internal/sbi/consumer"
-	"github.com/yashihh/tsctsf/util"
 )
 
 // Npcf_PolicyAuthorization : notify about 5GS Bridge information

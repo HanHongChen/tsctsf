@@ -8,9 +8,9 @@ import (
 	"sync"
 
 	"github.com/HanHongChen/bitbucket-openapi/models"
+	"github.com/HanHongChen/tsctsf/internal/logger"
+	"github.com/HanHongChen/tsctsf/pkg/factory"
 	"github.com/google/uuid"
-	"github.com/yashihh/tsctsf/internal/logger"
-	"github.com/yashihh/tsctsf/pkg/factory"
 )
 
 var tsnContext *TSCTSFContext

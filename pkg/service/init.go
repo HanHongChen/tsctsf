@@ -8,16 +8,16 @@ import (
 	"runtime/debug"
 	"syscall"
 
+	tsctsf_context "github.com/HanHongChen/tsctsf/internal/context"
+	"github.com/HanHongChen/tsctsf/internal/logger"
+	"github.com/HanHongChen/tsctsf/internal/sbi/consumer"
+	policyauthorization "github.com/HanHongChen/tsctsf/internal/sbi/policyauthorization"
+	timesynchronization "github.com/HanHongChen/tsctsf/internal/sbi/timesynchronization"
+	"github.com/HanHongChen/tsctsf/pkg/factory"
 	"github.com/free5gc/util/httpwrapper"
 	logger_util "github.com/free5gc/util/logger"
 	"github.com/gin-contrib/cors"
 	"github.com/sirupsen/logrus"
-	tsctsf_context "github.com/yashihh/tsctsf/internal/context"
-	"github.com/yashihh/tsctsf/internal/logger"
-	"github.com/yashihh/tsctsf/internal/sbi/consumer"
-	policyauthorization "github.com/yashihh/tsctsf/internal/sbi/policyauthorization"
-	timesynchronization "github.com/yashihh/tsctsf/internal/sbi/timesynchronization"
-	"github.com/yashihh/tsctsf/pkg/factory"
 )
 
 type TsctsfApp struct {

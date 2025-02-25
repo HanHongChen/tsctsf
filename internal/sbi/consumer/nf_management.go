@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
+	tsctsf_context "github.com/HanHongChen/tsctsf/internal/context"
+	"github.com/HanHongChen/tsctsf/internal/logger"
 	"github.com/free5gc/openapi"
-	tsctsf_context "github.com/yashihh/tsctsf/internal/context"
-	"github.com/yashihh/tsctsf/internal/logger"
 
 	"github.com/HanHongChen/bitbucket-openapi/Nnrf_NFManagement"
 	"github.com/HanHongChen/bitbucket-openapi/models"

@@ -7,8 +7,8 @@ import (
 	"sync"
 
 	"github.com/HanHongChen/bitbucket-openapi/models"
+	"github.com/HanHongChen/tsctsf/internal/logger"
 	"github.com/asaskevich/govalidator"
-	"github.com/yashihh/tsctsf/internal/logger"
 )
 
 const (

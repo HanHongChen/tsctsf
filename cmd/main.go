@@ -10,10 +10,10 @@ import (
 	logger_util "github.com/free5gc/util/logger"
 	"github.com/free5gc/util/version"
 
+	"github.com/HanHongChen/tsctsf/internal/logger"
+	"github.com/HanHongChen/tsctsf/pkg/factory"
+	"github.com/HanHongChen/tsctsf/pkg/service"
 	"github.com/urfave/cli"
-	"github.com/yashihh/tsctsf/internal/logger"
-	"github.com/yashihh/tsctsf/pkg/factory"
-	"github.com/yashihh/tsctsf/pkg/service"
 )
 
 var TSCTSF *service.TsctsfApp
