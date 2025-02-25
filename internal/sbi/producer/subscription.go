@@ -15,8 +15,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"bitbucket.org/free5gc-team/openapi/models"
-	"bitbucket.org/free5gc-team/util/httpwrapper"
+	"github.com/HanHongChen/bitbucket-openapi/models"
+	"github.com/free5gc/util/httpwrapper"
 	tsctsf_context "github.com/yashihh/tsctsf/internal/context"
 	"github.com/yashihh/tsctsf/internal/logger"
 	"github.com/yashihh/tsctsf/pkg/factory"

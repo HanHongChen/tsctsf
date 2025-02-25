@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"sync"
 
-	"bitbucket.org/free5gc-team/openapi/models"
+	"github.com/HanHongChen/bitbucket-openapi/models"
 	"github.com/asaskevich/govalidator"
 	"github.com/yashihh/tsctsf/internal/logger"
 )

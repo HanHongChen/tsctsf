@@ -8,8 +8,8 @@ import (
 	"runtime/debug"
 	"syscall"
 
-	logger_util "bitbucket.org/free5gc-team/util/logger"
 	"github.com/free5gc/util/httpwrapper"
+	logger_util "github.com/free5gc/util/logger"
 	"github.com/gin-contrib/cors"
 	"github.com/sirupsen/logrus"
 	tsctsf_context "github.com/yashihh/tsctsf/internal/context"

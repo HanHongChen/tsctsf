@@ -7,12 +7,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/free5gc/openapi"
 	tsctsf_context "github.com/yashihh/tsctsf/internal/context"
 	"github.com/yashihh/tsctsf/internal/logger"
 
-	"bitbucket.org/free5gc-team/openapi"
-	"bitbucket.org/free5gc-team/openapi/Nnrf_NFManagement"
-	"bitbucket.org/free5gc-team/openapi/models"
+	"github.com/HanHongChen/bitbucket-openapi/Nnrf_NFManagement"
+	"github.com/HanHongChen/bitbucket-openapi/models"
 )
 
 func BuildNFInstance(tsctsfContext *tsctsf_context.TSCTSFContext) (profile models.NfProfile, err error) {

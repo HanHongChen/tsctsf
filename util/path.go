@@ -3,8 +3,8 @@ package util
 import (
 	"net/url"
 
-	"bitbucket.org/free5gc-team/openapi/Npcf_PolicyAuthorization"
-	"bitbucket.org/free5gc-team/openapi/Ntsnaf_BridgeInfoManagement"
+	"github.com/HanHongChen/bitbucket-openapi/Npcf_PolicyAuthorization"
+	"github.com/HanHongChen/bitbucket-openapi/Ntsnaf_BridgeInfoManagement"
 )
 
 func GetNpcfPolicyAuthorizationClient() *Npcf_PolicyAuthorization.APIClient {

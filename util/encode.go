@@ -3,7 +3,7 @@ package util
 import (
 	"encoding/binary"
 
-	"bitbucket.org/free5gc-team/openapi/models"
+	"github.com/HanHongChen/bitbucket-openapi/models"
 	tsctsf_context "github.com/yashihh/tsctsf/internal/context"
 )
 

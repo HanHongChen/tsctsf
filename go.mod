@@ -1,10 +1,11 @@
-module github.com/yashihh/tsctsf
+module github.com/HanHongChen/tsctsf
 
 go 1.18
 
 require (
-	bitbucket.org/free5gc-team/openapi v0.0.0-20240920073207-f5f8afe35d8c
-	bitbucket.org/free5gc-team/util v0.0.0-20230511075254-e9f72181c776
+	github.com/HanHongChen/bitbucket-openapi v0.0.0-20250225143130-04e3d2759446
+	// github.com/HanHongChen/bitbucket-openapi v0.0.0-20240920073207-f5f8afe35d8c
+	// bitbucket.org/free5gc-team/util v0.0.0-20230511075254-e9f72181c776
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
 	github.com/free5gc/openapi v1.0.8
 	github.com/free5gc/util v1.0.6
@@ -17,6 +18,7 @@ require (
 )
 
 require (
+	github.com/HanHongChen/bitbucket-openapi v0.0.0-20250225143130-04e3d2759446 // indirect
 	github.com/antihax/optional v1.0.0 // indirect
 	github.com/bytedance/sonic v1.11.6 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
@@ -37,7 +39,7 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/mitchellh/mapstructure v1.4.2 // indirect
+	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.1 // indirect
@@ -47,13 +49,17 @@ require (
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
 	golang.org/x/arch v0.7.0 // indirect
-	golang.org/x/crypto v0.22.0 // indirect
-	golang.org/x/net v0.24.0 // indirect
-	golang.org/x/oauth2 v0.0.0-20210810183815-faf39c7919d5 // indirect
-	golang.org/x/sys v0.19.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/crypto v0.31.0 // indirect
+	golang.org/x/net v0.33.0 // indirect
+	golang.org/x/oauth2 v0.21.0 // indirect
+	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
 	google.golang.org/appengine v1.6.6 // indirect
 	google.golang.org/protobuf v1.34.0 // indirect
 	gopkg.in/h2non/gock.v1 v1.1.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+// replace github.com/HanHongChen/bitbucket-openapi => /home/cslab/Desktop/chh/bitbucket/openapi
+
+replace github.com/free5gc/openapi => /home/cslab/Desktop/chh/openapi

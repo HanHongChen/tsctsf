@@ -13,7 +13,7 @@ import (
 	"net/http"
 	"strings"
 
-	logger_util "bitbucket.org/free5gc-team/util/logger"
+	logger_util "github.com/free5gc/util/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/yashihh/tsctsf/internal/logger"
 )

@@ -13,8 +13,8 @@
 // package QoSandTSCAssistance
 
 // import (
-// 	"bitbucket.org/free5GC/openapi"
-// 	"bitbucket.org/free5GC/openapi/models"
+// 	"github.com/free5gc/openapi"
+// 	"github.com/free5gc/openapi/models"
 
 // 	"context"
 // 	"io"

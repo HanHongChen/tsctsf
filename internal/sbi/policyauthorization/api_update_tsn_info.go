@@ -12,11 +12,11 @@ package policyauthorization
 import (
 	"net/http"
 
+	"github.com/free5gc/openapi"
 	"github.com/gin-gonic/gin"
 
-	"bitbucket.org/free5gc-team/openapi"
-	"bitbucket.org/free5gc-team/openapi/models"
-	"bitbucket.org/free5gc-team/util/httpwrapper"
+	"github.com/HanHongChen/bitbucket-openapi/models"
+	"github.com/free5gc/util/httpwrapper"
 	"github.com/yashihh/tsctsf/internal/logger"
 	"github.com/yashihh/tsctsf/internal/sbi/producer"
 )

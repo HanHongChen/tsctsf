@@ -7,7 +7,7 @@ import (
 	"strings"
 	"sync"
 
-	"bitbucket.org/free5gc-team/openapi/models"
+	"github.com/HanHongChen/bitbucket-openapi/models"
 	"github.com/google/uuid"
 	"github.com/yashihh/tsctsf/internal/logger"
 	"github.com/yashihh/tsctsf/pkg/factory"

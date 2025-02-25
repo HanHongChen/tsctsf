@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"bitbucket.org/free5gc-team/openapi/models"
+	"github.com/HanHongChen/bitbucket-openapi/models"
 	"github.com/yashihh/tsctsf/internal/logger"
 	"github.com/yashihh/tsctsf/util"
 )
