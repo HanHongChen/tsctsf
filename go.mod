@@ -6,7 +6,6 @@ go 1.21
 
 require (
 	github.com/HanHongChen/bitbucket-openapi v0.0.0-20250225154822-b02f8b107d31
-	// github.com/HanHongChen/bitbucket-openapi v0.0.0-20240920073207-f5f8afe35d8c
 	// bitbucket.org/free5gc-team/util v0.0.0-20230511075254-e9f72181c776
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
 	github.com/free5gc/openapi v1.0.8
@@ -18,8 +17,6 @@ require (
 	github.com/urfave/cli v1.22.15
 	gopkg.in/yaml.v2 v2.4.0
 )
-
-require bitbucket.org/free5gc-team/openapi v0.0.0-00010101000000-000000000000
 
 require (
 	github.com/antihax/optional v1.0.0 // indirect
@@ -66,4 +63,4 @@ require (
 
 replace github.com/free5gc/openapi => /home/cslab/Desktop/chh/openapi
 
-replace bitbucket.org/free5gc-team/openapi => /home/cslab/Desktop/chh/bitbucket/openapi // Add this if not alreadygithub.com/
+// replace bitbucket.org/free5gc-team/openapi => /home/cslab/Desktop/chh/bitbucket/openapi // Add this if not alreadygithub.com/

@@ -12,10 +12,10 @@ package TimeSynchronization
 import (
 	"net/http"
 
-	"bitbucket.org/free5gc-team/openapi"
 	"github.com/HanHongChen/bitbucket-openapi/models"
 	"github.com/HanHongChen/tsctsf/internal/logger"
 	"github.com/HanHongChen/tsctsf/internal/sbi/producer"
+	"github.com/free5gc/openapi"
 	"github.com/free5gc/util/httpwrapper"
 	"github.com/gin-gonic/gin"
 )
