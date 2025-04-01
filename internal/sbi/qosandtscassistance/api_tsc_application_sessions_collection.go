@@ -14,13 +14,17 @@ package QoSandTSCAssistance
 
 import (
 	"github.com/free5gc/openapi"
-	"github.com/free5gc/openapi/models"
+	"github.com/free5gc/util/httpwrapper"
+
+	// "github.com/free5gc/openapi/models"
 	"github.com/gin-gonic/gin"
 
 	"context"
-	"io"
-	"net/url"
-	"strings"
+	"net/http"
+
+	"github.com/HanHongChen/openapi-tsctsf/models"
+	"github.com/HanHongChen/tsctsf/internal/logger"
+	"github.com/HanHongChen/tsctsf/internal/sbi/producer"
 )
 
 // Linger please
@@ -28,579 +32,51 @@ var (
 	_ context.Context
 )
 
-type TSCApplicationSessionsCollectionApiService service
-
-/*
- TSCApplicationSessionsCollectionApiService Creates a new Individual TSC Application Session Context resource
-  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-  * @param TscAppSessionContextData - Contains the information for the creation the resource.
-
- @return PostTSCAppSessionsResponse
-*/
-
-// PostTSCAppSessionsRequest
-type PostTSCAppSessionsRequest struct {
-	TscAppSessionContextData *models.TscAppSessionContextData
-}
-
-func (r *PostTSCAppSessionsRequest) SetTscAppSessionContextData(TscAppSessionContextData models.TscAppSessionContextData) {
-	r.TscAppSessionContextData = &TscAppSessionContextData
-}
-
-type PostTSCAppSessionsResponse struct {
-	Location                 string
-	TscAppSessionContextData *models.TscAppSessionContextData
-}
-
-type PostTSCAppSessionsError struct {
-	RetryAfter                   string
-	ProblemDetails               *models.ProblemDetails
-	ProblemDetailsTsctsfQosTscac *models.ProblemDetailsTsctsfQosTscac
-}
-
-func (a *TSCApplicationSessionsCollectionApiService) PostTSCAppSessions(c *gin.Context) {
-	var (
-		localVarHTTPMethod   = strings.ToUpper("Post")
-		localVarPostBody     interface{}
-		localVarFormFileName string
-		localVarFileName     string
-		localVarFileBytes    []byte
-		localVarReturnValue  PostTSCAppSessionsResponse
-	)
-
-	// create path and map variables
-	localVarPath := a.client.cfg.BasePath() + "/tsc-app-sessions"
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	localVarHTTPContentTypes := []string{"application/json"}
-
-	localVarHeaderParams["Content-Type"] = localVarHTTPContentTypes[0] // use the first content type specified in 'consumes'
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json", "application/problem+json"}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := strings.Join(localVarHTTPHeaderAccepts, ", ")
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-
-	// body params
-	localVarPostBody = request.TscAppSessionContextData
-
-	r, err := openapi.PrepareRequest(ctx, a.client.cfg, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+func PostTSCAppSessions(c *gin.Context) {
+	var tscAppSession models.TscAppSessionContextData
+	// step 1: retrieve http request body
+	requestBody, err := c.GetRawData()
 	if err != nil {
-		return nil, err
+		problemDetail := models.ProblemDetails{
+			Title:  "System failure",
+			Status: http.StatusInternalServerError,
+			Detail: err.Error(),
+			Cause:  "SYSTEM_FAILURE",
+		}
+		logger.TSCAppSessLog.Errorf("Get Request Body error: %+v", err)
+		c.JSON(http.StatusInternalServerError, problemDetail)
+		return
 	}
 
-	localVarHTTPResponse, err := openapi.CallAPI(a.client.cfg, r)
-	if err != nil || localVarHTTPResponse == nil {
-		return nil, err
-	}
-
-	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	// step 2: convert requestBody to openapi models
+	err = openapi.Deserialize(&tscAppSession, requestBody, "application/json")
 	if err != nil {
-		return nil, err
+		problemDetail := "[Request Body] " + err.Error()
+		rsp := models.ProblemDetails{
+			Title:  "Malformed request syntax",
+			Status: http.StatusBadRequest,
+			Detail: problemDetail,
+		}
+		logger.TSCAppSessLog.Errorln(problemDetail)
+		c.JSON(http.StatusBadRequest, rsp)
+		return
 	}
-	err = localVarHTTPResponse.Body.Close()
+
+	// step3 : handle request
+	req := httpwrapper.NewRequest(c.Request, tscAppSession)
+
+	rsp := producer.HandleCreateTSCAppSessions(req)
+	responseBody, err := openapi.Serialize(rsp.Body, "application/json")
 	if err != nil {
-		return nil, err
+		logger.TSCAppSessLog.Errorln(err)
+		problemDetails := models.ProblemDetails{
+			Status: http.StatusInternalServerError,
+			Cause:  "SYSTEM_FAILURE",
+			Detail: err.Error(),
+		}
+		c.JSON(http.StatusInternalServerError, problemDetails)
+	} else {
+		c.Data(rsp.Status, "application/json", responseBody)
 	}
 
-	apiError := openapi.GenericOpenAPIError{
-		RawBody:     localVarBody,
-		ErrorStatus: localVarHTTPResponse.StatusCode,
-	}
-
-	switch localVarHTTPResponse.StatusCode {
-	case 201:
-		err = openapi.Deserialize(&localVarReturnValue.TscAppSessionContextData, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		localVarReturnValue.Location = localVarHTTPResponse.Header.Get("Location")
-		return &localVarReturnValue, nil
-	case 400:
-		var v PostTSCAppSessionsError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 401:
-		var v PostTSCAppSessionsError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 403:
-		var v PostTSCAppSessionsError
-		err = openapi.Deserialize(&v.ProblemDetailsTsctsfQosTscac, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		v.RetryAfter = localVarHTTPResponse.Header.Get("Retry-After")
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 404:
-		var v PostTSCAppSessionsError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 411:
-		var v PostTSCAppSessionsError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 413:
-		var v PostTSCAppSessionsError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 415:
-		var v PostTSCAppSessionsError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 429:
-		var v PostTSCAppSessionsError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 500:
-		var v PostTSCAppSessionsError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 502:
-		var v PostTSCAppSessionsError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 503:
-		var v PostTSCAppSessionsError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	default:
-		return nil, apiError
-	}
-}
-
-// PostTSCAppSessionsTerminationRequestPostRequest
-type PostTSCAppSessionsTerminationRequestPostRequest struct {
-	TerminationInfo *models.TerminationInfo
-}
-
-func (r *PostTSCAppSessionsTerminationRequestPostRequest) SetTerminationInfo(TerminationInfo models.TerminationInfo) {
-	r.TerminationInfo = &TerminationInfo
-}
-
-type PostTSCAppSessionsTerminationRequestPostResponse struct {
-}
-
-type PostTSCAppSessionsTerminationRequestPostError struct {
-	Location             string
-	Var3gppSbiTargetNfId string
-	ProblemDetails       *models.ProblemDetails
-	RedirectResponse     *models.RedirectResponse
-}
-
-func (a *TSCApplicationSessionsCollectionApiService) PostTSCAppSessionsTerminationRequestPost(ctx context.Context, uri string, request *PostTSCAppSessionsTerminationRequestPostRequest) (*PostTSCAppSessionsTerminationRequestPostResponse, error) {
-	var (
-		localVarHTTPMethod   = strings.ToUpper("Post")
-		localVarPostBody     interface{}
-		localVarFormFileName string
-		localVarFileName     string
-		localVarFileBytes    []byte
-		localVarReturnValue  PostTSCAppSessionsTerminationRequestPostResponse
-	)
-
-	// create path and map variables
-	localVarPath := uri
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	localVarHTTPContentTypes := []string{"application/json"}
-
-	localVarHeaderParams["Content-Type"] = localVarHTTPContentTypes[0] // use the first content type specified in 'consumes'
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json", "application/problem+json"}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := strings.Join(localVarHTTPHeaderAccepts, ", ")
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-
-	// body params
-	localVarPostBody = request.TerminationInfo
-
-	r, err := openapi.PrepareRequest(ctx, a.client.cfg, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
-	if err != nil {
-		return nil, err
-	}
-
-	localVarHTTPResponse, err := openapi.CallAPI(a.client.cfg, r)
-	if err != nil || localVarHTTPResponse == nil {
-		return nil, err
-	}
-
-	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	if err != nil {
-		return nil, err
-	}
-	err = localVarHTTPResponse.Body.Close()
-	if err != nil {
-		return nil, err
-	}
-
-	apiError := openapi.GenericOpenAPIError{
-		RawBody:     localVarBody,
-		ErrorStatus: localVarHTTPResponse.StatusCode,
-	}
-
-	switch localVarHTTPResponse.StatusCode {
-	case 204:
-		return &localVarReturnValue, nil
-	case 307:
-		var v PostTSCAppSessionsTerminationRequestPostError
-		err = openapi.Deserialize(&v.RedirectResponse, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		v.Location = localVarHTTPResponse.Header.Get("Location")
-		v.Var3gppSbiTargetNfId = localVarHTTPResponse.Header.Get("3gpp-Sbi-Target-Nf-Id")
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 308:
-		var v PostTSCAppSessionsTerminationRequestPostError
-		err = openapi.Deserialize(&v.RedirectResponse, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		v.Location = localVarHTTPResponse.Header.Get("Location")
-		v.Var3gppSbiTargetNfId = localVarHTTPResponse.Header.Get("3gpp-Sbi-Target-Nf-Id")
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 400:
-		var v PostTSCAppSessionsTerminationRequestPostError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 401:
-		var v PostTSCAppSessionsTerminationRequestPostError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 403:
-		var v PostTSCAppSessionsTerminationRequestPostError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 404:
-		var v PostTSCAppSessionsTerminationRequestPostError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 411:
-		var v PostTSCAppSessionsTerminationRequestPostError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 413:
-		var v PostTSCAppSessionsTerminationRequestPostError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 415:
-		var v PostTSCAppSessionsTerminationRequestPostError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 429:
-		var v PostTSCAppSessionsTerminationRequestPostError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 500:
-		var v PostTSCAppSessionsTerminationRequestPostError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 502:
-		var v PostTSCAppSessionsTerminationRequestPostError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 503:
-		var v PostTSCAppSessionsTerminationRequestPostError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	default:
-		var v PostTSCAppSessionsTerminationRequestPostError
-		apiError.ErrorModel = v
-		return nil, apiError
-	}
-}
-
-// PostTSCAppSessionsEventNotificationPostRequest
-type PostTSCAppSessionsEventNotificationPostRequest struct {
-	EventsNotification *models.EventsNotification
-}
-
-func (r *PostTSCAppSessionsEventNotificationPostRequest) SetEventsNotification(EventsNotification models.EventsNotification) {
-	r.EventsNotification = &EventsNotification
-}
-
-type PostTSCAppSessionsEventNotificationPostResponse struct {
-}
-
-type PostTSCAppSessionsEventNotificationPostError struct {
-	Location             string
-	Var3gppSbiTargetNfId string
-	ProblemDetails       *models.ProblemDetails
-	RedirectResponse     *models.RedirectResponse
-}
-
-func (a *TSCApplicationSessionsCollectionApiService) PostTSCAppSessionsEventNotificationPost(ctx context.Context, uri string, request *PostTSCAppSessionsEventNotificationPostRequest) (*PostTSCAppSessionsEventNotificationPostResponse, error) {
-	var (
-		localVarHTTPMethod   = strings.ToUpper("Post")
-		localVarPostBody     interface{}
-		localVarFormFileName string
-		localVarFileName     string
-		localVarFileBytes    []byte
-		localVarReturnValue  PostTSCAppSessionsEventNotificationPostResponse
-	)
-
-	// create path and map variables
-	localVarPath := uri
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	localVarHTTPContentTypes := []string{"application/json"}
-
-	localVarHeaderParams["Content-Type"] = localVarHTTPContentTypes[0] // use the first content type specified in 'consumes'
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json", "application/problem+json"}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := strings.Join(localVarHTTPHeaderAccepts, ", ")
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-
-	// body params
-	localVarPostBody = request.EventsNotification
-
-	r, err := openapi.PrepareRequest(ctx, a.client.cfg, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
-	if err != nil {
-		return nil, err
-	}
-
-	localVarHTTPResponse, err := openapi.CallAPI(a.client.cfg, r)
-	if err != nil || localVarHTTPResponse == nil {
-		return nil, err
-	}
-
-	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	if err != nil {
-		return nil, err
-	}
-	err = localVarHTTPResponse.Body.Close()
-	if err != nil {
-		return nil, err
-	}
-
-	apiError := openapi.GenericOpenAPIError{
-		RawBody:     localVarBody,
-		ErrorStatus: localVarHTTPResponse.StatusCode,
-	}
-
-	switch localVarHTTPResponse.StatusCode {
-	case 204:
-		return &localVarReturnValue, nil
-	case 307:
-		var v PostTSCAppSessionsEventNotificationPostError
-		err = openapi.Deserialize(&v.RedirectResponse, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		v.Location = localVarHTTPResponse.Header.Get("Location")
-		v.Var3gppSbiTargetNfId = localVarHTTPResponse.Header.Get("3gpp-Sbi-Target-Nf-Id")
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 308:
-		var v PostTSCAppSessionsEventNotificationPostError
-		err = openapi.Deserialize(&v.RedirectResponse, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		v.Location = localVarHTTPResponse.Header.Get("Location")
-		v.Var3gppSbiTargetNfId = localVarHTTPResponse.Header.Get("3gpp-Sbi-Target-Nf-Id")
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 400:
-		var v PostTSCAppSessionsEventNotificationPostError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 401:
-		var v PostTSCAppSessionsEventNotificationPostError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 403:
-		var v PostTSCAppSessionsEventNotificationPostError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 404:
-		var v PostTSCAppSessionsEventNotificationPostError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 411:
-		var v PostTSCAppSessionsEventNotificationPostError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 413:
-		var v PostTSCAppSessionsEventNotificationPostError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 415:
-		var v PostTSCAppSessionsEventNotificationPostError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 429:
-		var v PostTSCAppSessionsEventNotificationPostError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 500:
-		var v PostTSCAppSessionsEventNotificationPostError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 502:
-		var v PostTSCAppSessionsEventNotificationPostError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	case 503:
-		var v PostTSCAppSessionsEventNotificationPostError
-		err = openapi.Deserialize(&v.ProblemDetails, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			return nil, err
-		}
-		apiError.ErrorModel = v
-		return nil, apiError
-	default:
-		var v PostTSCAppSessionsEventNotificationPostError
-		apiError.ErrorModel = v
-		return nil, apiError
-	}
 }

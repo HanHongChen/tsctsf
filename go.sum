@@ -36,6 +36,8 @@ github.com/BurntSushi/toml v1.3.2/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbi
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/HanHongChen/bitbucket-openapi v0.0.0-20250225154822-b02f8b107d31 h1:h/xQjLIG9ZPlqLk+gHBO+k56VdqUBRo6WKYETSr47GQ=
 github.com/HanHongChen/bitbucket-openapi v0.0.0-20250225154822-b02f8b107d31/go.mod h1:S9X/yzNjmJEDgdzkSuC89yCtZELHUKF+7E4rbzeACdQ=
+github.com/HanHongChen/openapi-tsctsf v0.0.0-20250309105527-3b0ccd82e5fa h1:i/xem56kIPk0yA3xWeSxQsDNrWcxvHKHB5Zs0yhQGo0=
+github.com/HanHongChen/openapi-tsctsf v0.0.0-20250309105527-3b0ccd82e5fa/go.mod h1:wT4wxnWKQRLffR+hLM07L7vtYk4ghLXG5DYbGV+Hmo4=
 github.com/antihax/optional v1.0.0 h1:xK2lYat7ZLaVVcIuj82J8kIro4V6kDe0AUDFboUCwcg=
 github.com/antihax/optional v1.0.0/go.mod h1:uupD/76wgC+ih3iEmQUL+0Ugr19nfwCT1kdvxnR2qWY=
 github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 h1:DklsrG3dyBCFEj5IhUbnKptjxatkF07cF2ak3yi77so=
