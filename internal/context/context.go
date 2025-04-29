@@ -1,19 +1,29 @@
 package context
 
 import (
+	"context"
 	"net"
 	"os"
 	"strconv"
 	"strings"
 	"sync"
 
-	"github.com/HanHongChen/bitbucket-openapi/models"
+	"github.com/HanHongChen/openapi-tsctsf/models"
+	"github.com/HanHongChen/openapi-tsctsf/oauth"
+
+	//github.com/HanHongChen/bitbucket-openapi/models
 	"github.com/HanHongChen/tsctsf/internal/logger"
 	"github.com/HanHongChen/tsctsf/pkg/factory"
 	"github.com/google/uuid"
 )
 
 var tsnContext *TSCTSFContext
+
+var _ NFContext = &TSCTSFContext{}
+
+type NFContext interface {
+	AuthorizationCheck(token string, serviceName models.ServiceName) error
+}
 
 func Init() {
 
@@ -86,7 +96,7 @@ func (context *TSCTSFContext) InitNFService(srvNameList []string, version string
 			IpEndPoints: &[]models.IpEndPoint{
 				{
 					Ipv4Address: context.RegisterIPv4,
-					Transport:   models.TransportProtocol_TCP,
+					Transport:   models.NrfNfManagementTransportProtocol_TCP,
 					Port:        int32(context.SBIPort),
 				},
 			},
@@ -107,6 +117,9 @@ type TSCTSFContext struct {
 	Bridges          map[uint64]Bridge_info // key is Bridge_ID
 	SubscripSession  map[string]string      // key is Session_ID
 	// NwttIndex        map[int]int
+
+	OAuth2Required bool
+	NrfCertPem     string
 }
 
 type Bridge_info struct {
@@ -185,4 +198,22 @@ func GetSelf() *TSCTSFContext {
 
 func (a *TSCTSFContext) GetSelfID() string {
 	return a.NfId
+}
+
+func (a *TSCTSFContext) GetTokenCtx(serviceName models.ServiceName, targetNF models.NrfNfManagementNfType) (
+	context.Context, *models.ProblemDetails, error,
+) {
+	if !a.OAuth2Required {
+		return context.TODO(), nil, nil
+	}
+	return oauth.GetTokenCtx(models.NrfNfManagementNfType_TSCTSF, targetNF,
+		a.NfId, a.NrfUri, string(serviceName))
+}
+
+func (a *TSCTSFContext) AuthorizationCheck(token string, serviceName models.ServiceName) error {
+	if !a.OAuth2Required {
+		return nil
+	}
+	return oauth.VerifyOAuth(token, string(serviceName), a.NrfCertPem)
+
 }

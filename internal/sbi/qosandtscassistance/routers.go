@@ -32,7 +32,7 @@ func NewRouter() *gin.Engine {
 }
 
 func AddService(engine *gin.Engine) *gin.RouterGroup {
-	group := engine.Group("/ntsctsf-time-sync/v1")
+	group := engine.Group("/ntsctsf-qos-tsc-assistance/v1")
 
 	for _, route := range routes {
 		switch route.Method {
@@ -70,38 +70,38 @@ var routes = Routes{
 		"/tsc-app-sessions",
 		PostTSCAppSessions,
 	},
-	{
-		"GetTSCAppSession",
-		strings.ToUpper("Get"),
-		"/tsc-app-sessions/:appSessionId",
-		GetTSCAppSession,
-	},
+	// {
+	// 	"GetTSCAppSession",
+	// 	strings.ToUpper("Get"),
+	// 	"/tsc-app-sessions/:appSessionId",
+	// 	GetTSCAppSession,
+	// },
 
-	{
-		"ModAppSession",
-		strings.ToUpper("Patch"),
-		"/tsc-app-sessions/:appSessionId",
-		ModAppSession,
-	},
+	// {
+	// 	"ModAppSession",
+	// 	strings.ToUpper("Patch"),
+	// 	"/tsc-app-sessions/:appSessionId",
+	// 	ModAppSession,
+	// },
 
-	{
-		"DeleteTSCAppSession",
-		strings.ToUpper("Delete"),
-		"/tsc-app-sessions/:appSessionId/delete",
-		DeleteTSCAppSession,
-	},
+	// {
+	// 	"DeleteTSCAppSession",
+	// 	strings.ToUpper("Delete"),
+	// 	"/tsc-app-sessions/:appSessionId/delete",
+	// 	DeleteTSCAppSession,
+	// },
 
-	{
-		"putEventsSubsc",
-		strings.ToUpper("Put"),
-		"/tsc-app-sessions/:appSessionId/events-subscription",
-		putEventsSubsc,
-	},
+	// {
+	// 	"putEventsSubsc",
+	// 	strings.ToUpper("Put"),
+	// 	"/tsc-app-sessions/:appSessionId/events-subscription",
+	// 	putEventsSubsc,
+	// },
 
-	{
-		"DeleteEventsSubsc",
-		strings.ToUpper("Get"),
-		"/tsc-app-sessions/:appSessionId/events-subscription",
-		DeleteEventsSubsc,
-	},
+	// {
+	// 	"DeleteEventsSubsc",
+	// 	strings.ToUpper("Get"),
+	// 	"/tsc-app-sessions/:appSessionId/events-subscription",
+	// 	DeleteEventsSubsc,
+	// },
 }

@@ -6,7 +6,8 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/HanHongChen/bitbucket-openapi/models"
+	"github.com/HanHongChen/openapi-tsctsf/models"
+	//github.com/HanHongChen/bitbucket-openapi/models
 	"github.com/HanHongChen/tsctsf/internal/logger"
 	"github.com/asaskevich/govalidator"
 )
@@ -16,7 +17,7 @@ const (
 	// TsctsfDefaultCertPemPath        = "./cert/tsctsf.pem"
 	// TsctsfDefaultPrivateKeyPath     = "./cert/tsctsf.key"
 	TsctsfDefaultConfigPath = "./config/tsctsfcfg.yaml"
-	TsctsfSbiDefaultIPv4    = "127.0.0.50"
+	TsctsfSbiDefaultIPv4    = "127.0.0.56"
 	TsctsfSbiDefaultPort    = 8000
 	TsctsfSbiDefaultScheme  = "https"
 	TsctsfDefaultNrfUri     = "https://127.0.0.10:8000"
@@ -76,6 +77,7 @@ func (c *Configuration) validate() (bool, error) {
 	for index, serviceName := range c.ServiceNameList {
 		switch {
 		case serviceName == "ntsctsf_timesynchronization":
+		case serviceName == "ntsctsf_qosandtscassistance":
 		default:
 			err := errors.New("Invalid serviceNameList[" + strconv.Itoa(index) + "]: " +
 				serviceName + ", should be ntsctsf_timesynchronization.")

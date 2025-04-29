@@ -48,6 +48,7 @@ func main() {
 }
 
 func action(cliCtx *cli.Context) error {
+	// Initializes log files based on command-line arguments and gets the TLS key log path
 	tlsKeyLogPath, err := initLogFile(cliCtx.StringSlice("log"))
 	if err != nil {
 		return err
@@ -55,18 +56,23 @@ func action(cliCtx *cli.Context) error {
 
 	logger.MainLog.Infoln("TSCTSF version: ", version.GetVersion())
 
+	// Reads the configuration file specified by the user
 	cfg, err := factory.ReadConfig(cliCtx.String("config"))
 	if err != nil {
 		return err
 	}
 	factory.TsctsfConfig = cfg
 
+	// Creates a new TSCTSF application instance with the configuration
 	tsctsf, err := service.NewApp(cfg)
 	if err != nil {
 		return err
 	}
+
+	// Stores the app instance in the global TSCTSF variable
 	TSCTSF = tsctsf
 
+	// Starts the TSCTSF application with the TLS key log path
 	tsctsf.Start(tlsKeyLogPath)
 
 	return nil
