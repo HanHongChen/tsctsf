@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
 	"math/rand"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"runtime/debug"
+	"syscall"
 	"time"
 
 	logger_util "github.com/free5gc/util/logger"
@@ -54,7 +57,17 @@ func action(cliCtx *cli.Context) error {
 		return err
 	}
 
+	logger.MainLog.Infoln(cliCtx.App.Name)
 	logger.MainLog.Infoln("TSCTSF version: ", version.GetVersion())
+
+	ctx, cancel := context.WithCancel(context.Background())
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
+
+	go func() {
+		<-sigCh  // Wait for interrupt signal to gracefully shutdown UPF
+		cancel() // Notify each goroutine and wait them stopped
+	}()
 
 	// Reads the configuration file specified by the user
 	cfg, err := factory.ReadConfig(cliCtx.String("config"))
@@ -64,16 +77,20 @@ func action(cliCtx *cli.Context) error {
 	factory.TsctsfConfig = cfg
 
 	// Creates a new TSCTSF application instance with the configuration
-	tsctsf, err := service.NewApp(cfg)
+	tsctsf, err := service.NewApp(ctx, cfg, tlsKeyLogPath)
 	if err != nil {
+		sigCh <- nil
 		return err
 	}
 
 	// Stores the app instance in the global TSCTSF variable
 	TSCTSF = tsctsf
+	if tsctsf == nil {
+		logger.MainLog.Infoln("tsctsf is nil")
+	}
 
 	// Starts the TSCTSF application with the TLS key log path
-	tsctsf.Start(tlsKeyLogPath)
+	tsctsf.Start()
 
 	return nil
 }
