@@ -2,7 +2,6 @@ package sbi
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"runtime/debug"
@@ -12,11 +11,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 
-	"github.com/HanHongChen/openapi-tsctsf/util/httpwrapper"
 	"github.com/HanHongChen/tsctsf/internal/logger"
 	"github.com/HanHongChen/tsctsf/internal/sbi/consumer"
 	"github.com/HanHongChen/tsctsf/internal/sbi/processor"
 	"github.com/HanHongChen/tsctsf/pkg/app"
+	"github.com/HanHongChen/tsctsf/pkg/factory"
+	"github.com/free5gc/util/httpwrapper"
 	logger_util "github.com/free5gc/util/logger"
 )
 
@@ -65,7 +65,7 @@ func NewServer(tsctsf tsctsf, tlsKeyLogPath string) (*Server, error) {
 	}
 
 	qosAndTscRoutes := s.getQoSAnsTscRoutes()
-	qosAndTscGroup := s.router.Group(factory.tsctsfQoSAndTscResUriPrefix)
+	qosAndTscGroup := s.router.Group(factory.TsctsfQoSAndTscResUriPrefix)
 	applyRoutes(qosAndTscGroup, qosAndTscRoutes)
 
 	cfg := s.Config()
@@ -121,18 +121,18 @@ func (s *Server) startServer(wg *sync.WaitGroup) {
 	logger.SBILog.Infof("Start SBI server (listen on %s)", s.httpServer.Addr)
 
 	var err error
-	cfg := s.Config()
-	scheme := cfg.GetSbiScheme()
-	if scheme == "http" {
-		err = s.httpServer.ListenAndServe()
-	} else if scheme == "https" {
-		err = s.httpServer.ListenAndServeTLS(
-			cfg.GetCertPemPath(),
-			cfg.GetCertKeyPath())
-	} else {
-		err = fmt.Errorf("No support this scheme[%s]", scheme)
-	}
-
+	// cfg := s.Config()
+	// scheme := cfg.GetSbiScheme()
+	// if scheme == "http" {
+	// 	err = s.httpServer.ListenAndServe()
+	// } else if scheme == "https" {
+	// 	err = s.httpServer.ListenAndServeTLS(
+	// 		cfg.GetCertPemPath(),
+	// 		cfg.GetCertKeyPath())
+	// } else {
+	// 	err = fmt.Errorf("No support this scheme[%s]", scheme)
+	// }
+	err = s.httpServer.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
 		logger.SBILog.Errorf("SBI server error: %v", err)
 	}

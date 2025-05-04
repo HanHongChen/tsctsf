@@ -3,6 +3,7 @@ package factory
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strconv"
 	"sync"
 
@@ -16,11 +17,12 @@ const (
 	TsctsfDefaultTLSKeyLogPath = "./log/tsctsfsslkey.log"
 	// TsctsfDefaultCertPemPath        = "./cert/tsctsf.pem"
 	// TsctsfDefaultPrivateKeyPath     = "./cert/tsctsf.key"
-	TsctsfDefaultConfigPath = "./config/tsctsfcfg.yaml"
-	TsctsfSbiDefaultIPv4    = "127.0.0.56"
-	TsctsfSbiDefaultPort    = 8000
-	TsctsfSbiDefaultScheme  = "https"
-	TsctsfDefaultNrfUri     = "https://127.0.0.10:8000"
+	TsctsfDefaultConfigPath     = "./config/tsctsfcfg.yaml"
+	TsctsfSbiDefaultIPv4        = "127.0.0.56"
+	TsctsfSbiDefaultPort        = 8000
+	TsctsfSbiDefaultScheme      = "https"
+	TsctsfDefaultNrfUri         = "https://127.0.0.10:8000"
+	TsctsfQoSAndTscResUriPrefix = "/ntsctsf-qos-tsc-assistance/v1/"
 )
 
 type Config struct {
@@ -241,4 +243,36 @@ func (c *Config) GetLogReportCaller() bool {
 		return false
 	}
 	return c.Logger.ReportCaller
+}
+
+func (c *Config) GetSbiBindingIP() string {
+	c.RLock()
+	defer c.RUnlock()
+	bindIP := "0.0.0.0"
+	if c.Configuration == nil || c.Configuration.Sbi == nil {
+		return bindIP
+	}
+	if c.Configuration.Sbi.BindingIPv4 != "" {
+		if bindIP = os.Getenv(c.Configuration.Sbi.BindingIPv4); bindIP != "" {
+			logger.CfgLog.Infof("Parsing ServerIPv4 [%s] from ENV Variable", bindIP)
+		} else {
+			bindIP = c.Configuration.Sbi.BindingIPv4
+		}
+	}
+	return bindIP
+}
+
+func (c *Config) GetSbiPort() int {
+	c.RLock()
+	defer c.RUnlock()
+	if c.Configuration != nil && c.Configuration.Sbi != nil && c.Configuration.Sbi.Port != 0 {
+		return c.Configuration.Sbi.Port
+	}
+	return TsctsfSbiDefaultPort
+}
+
+func (c *Config) GetSbiBindingAddr() string {
+	c.RLock()
+	defer c.RUnlock()
+	return c.GetSbiBindingIP() + ":" + strconv.Itoa(c.GetSbiPort())
 }

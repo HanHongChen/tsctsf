@@ -20,6 +20,7 @@ var (
 	TimeSyncSubLog *logrus.Entry
 	TimeSyncCfgLog *logrus.Entry
 	TSCAppSessLog  *logrus.Entry
+	SBILog         *logrus.Entry
 )
 
 func init() {
@@ -41,5 +42,5 @@ func init() {
 	TimeSyncSubLog = NfLog.WithField(logger_util.FieldCategory, "TimeSyncSub")
 	TimeSyncCfgLog = NfLog.WithField(logger_util.FieldCategory, "TimeSyncCfg")
 	TSCAppSessLog = NfLog.WithField(logger_util.FieldCategory, "TSCAppSessLog")
-
+	SBILog = NfLog.WithField(logger_util.FieldCategory, "SBI")
 }

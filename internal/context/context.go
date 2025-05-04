@@ -19,11 +19,11 @@ import (
 
 var tsnContext *TSCTSFContext
 
-var _ NFContext = &TSCTSFContext{}
+// var _ NFContext = &TSCTSFContext{}
 
-type NFContext interface {
-	AuthorizationCheck(token string, serviceName models.ServiceName) error
-}
+// type NFContext interface {
+// 	AuthorizationCheck(token string, serviceName models.ServiceName) error
+// }
 
 func Init() {
 
@@ -68,7 +68,7 @@ func Init() {
 	serviceNameList := configuration.ServiceNameList
 
 	// context.NfService
-	tsnContext.NfService = make(map[models.ServiceName]models.NfService)
+	tsnContext.NfService = make(map[models.ServiceName]models.NrfNfManagementNfService)
 	tsnContext.InitNFService(serviceNameList, config.Info.Version)
 	tsnContext.Bridges = make(map[uint64]Bridge_info)
 	tsnContext.SubscripSession = make(map[string]string)
@@ -81,10 +81,10 @@ func (context *TSCTSFContext) InitNFService(srvNameList []string, version string
 	versionUri := "v" + tmpVersion[0]
 	for index, nameString := range srvNameList {
 		name := models.ServiceName(nameString)
-		context.NfService[name] = models.NfService{
+		context.NfService[name] = models.NrfNfManagementNfService{
 			ServiceInstanceId: strconv.Itoa(index),
 			ServiceName:       name,
-			Versions: &[]models.NfServiceVersion{
+			Versions: []models.NfServiceVersion{
 				{
 					ApiFullVersion:  version,
 					ApiVersionInUri: versionUri,
@@ -93,7 +93,7 @@ func (context *TSCTSFContext) InitNFService(srvNameList []string, version string
 			Scheme:          context.UriScheme,
 			NfServiceStatus: models.NfServiceStatus_REGISTERED,
 			ApiPrefix:       context.Url,
-			IpEndPoints: &[]models.IpEndPoint{
+			IpEndPoints: []models.IpEndPoint{
 				{
 					Ipv4Address: context.RegisterIPv4,
 					Transport:   models.NrfNfManagementTransportProtocol_TCP,
@@ -106,20 +106,24 @@ func (context *TSCTSFContext) InitNFService(srvNameList []string, version string
 
 type TSCTSFContext struct {
 	NfId             string
+	Name             string
 	SBIPort          int
 	RegisterIPv4     string
 	BindingIPv4      string
 	Url              string
 	UriScheme        models.UriScheme
 	NrfUri           string
-	NfService        map[models.ServiceName]models.NfService
+	PcfUri           string
+	PcfURILock       sync.RWMutex
+	NfService        map[models.ServiceName]models.NrfNfManagementNfService
 	AppSessionIdPool sync.Map
 	Bridges          map[uint64]Bridge_info // key is Bridge_ID
 	SubscripSession  map[string]string      // key is Session_ID
+	Locality         string
 	// NwttIndex        map[int]int
 
-	OAuth2Required bool
-	NrfCertPem     string
+	// OAuth2Required bool
+	// NrfCertPem     string
 }
 
 type Bridge_info struct {
@@ -203,17 +207,17 @@ func (a *TSCTSFContext) GetSelfID() string {
 func (a *TSCTSFContext) GetTokenCtx(serviceName models.ServiceName, targetNF models.NrfNfManagementNfType) (
 	context.Context, *models.ProblemDetails, error,
 ) {
-	if !a.OAuth2Required {
-		return context.TODO(), nil, nil
-	}
+	// if !a.OAuth2Required {
+	// 	return context.TODO(), nil, nil
+	// }
 	return oauth.GetTokenCtx(models.NrfNfManagementNfType_TSCTSF, targetNF,
 		a.NfId, a.NrfUri, string(serviceName))
 }
 
-func (a *TSCTSFContext) AuthorizationCheck(token string, serviceName models.ServiceName) error {
-	if !a.OAuth2Required {
-		return nil
-	}
-	return oauth.VerifyOAuth(token, string(serviceName), a.NrfCertPem)
+// func (a *TSCTSFContext) AuthorizationCheck(token string, serviceName models.ServiceName) error {
+// 	if !a.OAuth2Required {
+// 		return nil
+// 	}
+// 	return oauth.VerifyOAuth(token, string(serviceName), a.NrfCertPem)
 
-}
+// }
