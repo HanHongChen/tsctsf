@@ -59,6 +59,6 @@ func (s *npcfService) DetNetAppSessionCreate(uri string, req *PolicyAuthorizatio
 		logger.PolicyAuthLog.Infof("send Individual App Session context create successfully")
 		return resp, nil
 	}
-
+	logger.PolicyAuthLog.Warnln("send Individual App Session context create Error")
 	return resp, err
 }
