@@ -2,6 +2,7 @@ package processor
 
 import (
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/HanHongChen/openapi-tsctsf/models"
@@ -18,8 +19,8 @@ func ConvertTscEventsToAfSubscriptions(tscEvents []models.TscEvent) []models.AfE
 	for _, e := range tscEvents {
 		var afEvent models.PcfPolicyAuthorizationAfEvent
 		switch e {
-		case models.TscEvent_FAILED_RESOURCES_ALLOCATION:
-			afEvent = models.PcfPolicyAuthorizationAfEvent_FAILED_RESOURCES_ALLOCATION
+		// case models.TscEvent_FAILED_RESOURCES_ALLOCATION:
+		// 	afEvent = models.PcfPolicyAuthorizationAfEvent_FAILED_RESOURCES_ALLOCATION
 		case models.TscEvent_SUCCESSFUL_RESOURCES_ALLOCATION:
 			afEvent = models.PcfPolicyAuthorizationAfEvent_SUCCESSFUL_RESOURCES_ALLOCATION
 		default:
@@ -34,9 +35,19 @@ func ConvertTscEventsToAfSubscriptions(tscEvents []models.TscEvent) []models.AfE
 	return afSubs
 }
 
-// func (p *Processor) getDefaultPcfUri(context *tsctsf_context.TSCTSFContext) string {
-// 	context
-// }
+func ConvertFlowInfoToMediaSubComps(flowInfos []models.FlowInfo) map[string]models.MediaSubComponent {
+	medSubComps := make(map[string]models.MediaSubComponent)
+	for _, fi := range flowInfos {
+		key := strconv.Itoa(int(fi.FlowId))
+		medSubComps[key] = models.MediaSubComponent{
+			FNum:    int32(fi.FlowId),
+			FDescs:  fi.FlowDescriptions,
+			FStatus: models.FlowStatus_ENABLED,
+			// MarBwUl: "100M", // optional; replace with actual value if needed
+		}
+	}
+	return medSubComps
+}
 
 func (p *Processor) HandlePostTSCAppSession(c *gin.Context, tscAppSessContext models.TscAppSessionContextData) {
 	logger.TSCAppSessLog.Info("Handle TSC App Session Post")
@@ -82,9 +93,12 @@ func (p *Processor) HandlePostTSCAppSession(c *gin.Context, tscAppSessContext mo
 		logger.TSCAppSessLog.Warnf("PostTSCAppSession parseDlTime fail [%v]", err)
 	}
 
+	medSubComps := ConvertFlowInfoToMediaSubComps(tscAppSessContext.FlowInfo)
+	logger.TSCAppSessLog.Infof("medSubComps = [%+v]", medSubComps)
+
 	medComp := models.MediaComponent{
 		AfAppId:  tscAppSessContext.AfId,
-		MedCompN: 1,
+		MedCompN: 1, //ordinal number of the media component
 		TsnQos: &models.TsnQosContainer{
 			TscPackDelay:    10,
 			MaxTscBurstSize: 4096,
@@ -98,6 +112,7 @@ func (p *Processor) HandlePostTSCAppSession(c *gin.Context, tscAppSessContext mo
 			Periodicity:      1,
 			BurstArrivalTime: &parsedDlTime,
 		},
+		MedSubComps: medSubComps,
 	}
 
 	appSessContext := &models.AppSessionContext{
@@ -131,7 +146,7 @@ func (p *Processor) HandlePostTSCAppSession(c *gin.Context, tscAppSessContext mo
 		// TODO : the conditions to match for notifying the event within the "eventFilters" attribute;
 		_, exist := tsctsf_self.AppSessionIdPool.Load(resp.AppSessionContext.AscReqData.UeIpv4)
 		if !exist {
-			logger.TSCAppSessLog.Infof("Store New AF-session ID :[%d] with DNN/S-NSSAI :[%s]", appSessID,
+			logger.TSCAppSessLog.Infof("Store New AF-session ID :[%s] with DNN/S-NSSAI :[%s]", appSessID,
 				resp.AppSessionContext.AscReqData.UeIpv4)
 			tsctsf_self.AppSessionIdPool.Store(resp.AppSessionContext.AscReqData.UeIpv4, appSessID)
 		}
@@ -141,13 +156,14 @@ func (p *Processor) HandlePostTSCAppSession(c *gin.Context, tscAppSessContext mo
 			UeIpAddr:     tscAppSessContext.UeIpAddr,
 			FlowInfo:     tscAppSessContext.FlowInfo,
 			QosReference: tscAppSessContext.QosReference,
-			AppId:        tscAppSessContext.AppId, // parsed from PCF Location
+			AppId:        tscAppSessContext.AppId,
 			//TODO: SPEC said it need notifyUri
 		}
 
 		c.JSON(http.StatusCreated, tsctsfResp)
+		return
 	}
 
-	logger.TSCAppSessLog.Warnf("PostTSCAppSession error [%+v]", err.Error())
+	logger.TSCAppSessLog.Warnf("PostTSCAppSession error [%+v]", err)
 	c.JSON(http.StatusInternalServerError, err)
 }
