@@ -1,13 +1,15 @@
 package context
 
 import (
+	"fmt"
 	"net"
 	"os"
 	"strconv"
 	"strings"
 	"sync"
 
-	"github.com/HanHongChen/bitbucket-openapi/models"
+	"github.com/HanHongChen/openapi-tsctsf/models"
+	//github.com/HanHongChen/bitbucket-openapi/models
 	"github.com/HanHongChen/tsctsf/internal/logger"
 	"github.com/HanHongChen/tsctsf/pkg/factory"
 	"github.com/google/uuid"
@@ -53,16 +55,27 @@ func Init() {
 			}
 		}
 	}
-	tsnContext.NrfUri = configuration.NrfUri
 	tsnContext.Url = string(tsnContext.UriScheme) + "://" + tsnContext.RegisterIPv4 + ":" + strconv.Itoa(tsnContext.SBIPort)
 	serviceNameList := configuration.ServiceNameList
-
+	tsnContext.PcfUri = configuration.PcfUri
 	// context.NfService
 	tsnContext.NfService = make(map[models.ServiceName]models.NfService)
 	tsnContext.InitNFService(serviceNameList, config.Info.Version)
 	tsnContext.Bridges = make(map[uint64]Bridge_info)
 	tsnContext.SubscripSession = make(map[string]string)
 	// tsnContext.NwttIndex = make(map[int]int)
+
+	routers := config.RouterInfo // []RouterInfo
+	tsnContext.Routers = make(map[string]RouterInfo)
+	for _, router := range routers {
+		tsnContext.Routers[router.UpNodeId] = RouterInfo{
+			UpNodeId: router.UpNodeId,
+			UeIp:     router.UeIp,
+			Port:     router.Port,
+			Mtu:      router.Mtu,
+		}
+		fmt.Println(router)
+	}
 
 }
 
@@ -106,7 +119,16 @@ type TSCTSFContext struct {
 	AppSessionIdPool sync.Map
 	Bridges          map[uint64]Bridge_info // key is Bridge_ID
 	SubscripSession  map[string]string      // key is Session_ID
+	Routers          map[string]RouterInfo
+	PcfUri			 string
 	// NwttIndex        map[int]int
+}
+
+type RouterInfo struct {
+	UpNodeId string
+	UeIp     string
+	Port     int
+	Mtu      int
 }
 
 type Bridge_info struct {
