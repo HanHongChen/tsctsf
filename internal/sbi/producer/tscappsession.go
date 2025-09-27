@@ -30,7 +30,7 @@ func TSCAppSessionsCreateProcedure(tscAppSession models.TscAppSessionContextData
 	*models.ProblemDetails) {
 
 	logger.TSCAppSessLog.Infof("tscAppSession")
-	ueAddr := tscAppSession.UeIpAddr
+	ueAddr := tscAppSession.UeIpAddr.Ipv4Addr
 	afIdentifier := tscAppSession.AfId
 	flowDescription := tscAppSession.FlowInfo
 	qosParam := tscAppSession.QosReference
@@ -52,21 +52,22 @@ func TSCAppSessionsCreateProcedure(tscAppSession models.TscAppSessionContextData
 	// 	logger.TSCAppSessLog.Infof("No session found for the given ueAddr. Create new AF session.")
 	var newDetNet consumer.PduSessionDetNet
 	newDetNet.Dnn = tscAppSession.Dnn
-	newDetNet.Snssai = *tscAppSession.Snssai
+	// newDetNet.Snssai = *tscAppSession.Snssai
 	newDetNet.UeIpv4Addr = ueAddr
 	// 	resp, err := consumer.HandleDetNetAppSessionCreate(newDetNet)
 	// 	return
 	// }
 	logger.TSCAppSessLog.Infof("Create new AF session.")
 	resp, err := consumer.HandleDetNetAppSessionCreate(newDetNet)
+	tscAppSessionContextData := resp.TscAppSessionContextData
 	if err != nil {
 		logger.TSCAppSessLog.Warningf("Producer called TSCAppSessionsCreateProcedure error [%+v].", err)
 		problemDetails := &models.ProblemDetails{
 			Status: http.StatusInternalServerError,
 			Cause:  "UNSPECIFIED",
 		}
-		return *resp.TscAppSessionContextData, "", problemDetails
+		return tscAppSessionContextData, "", problemDetails
 	}
-
-	return *resp.TscAppSessionContextData, resp.Location, nil
+	logger.TSCAppSessLog.Warningln("TSCAppSessionsCreateProcedure successfully")
+	return tscAppSessionContextData, resp.Location, nil
 }

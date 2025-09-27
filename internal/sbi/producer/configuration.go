@@ -3,16 +3,12 @@ package producer
 import (
 	"fmt"
 	"math"
-	"net/http"
 	"strconv"
 
-	"github.com/HanHongChen/bitbucket-openapi/models"
+	//github.com/HanHongChen/bitbucket-openapi/models
 	tsctsf_context "github.com/HanHongChen/tsctsf/internal/context"
 	"github.com/HanHongChen/tsctsf/internal/logger"
-	"github.com/HanHongChen/tsctsf/internal/sbi/consumer"
 	"github.com/HanHongChen/tsctsf/pkg/factory"
-	"github.com/HanHongChen/tsctsf/util"
-	"github.com/free5gc/util/httpwrapper"
 )
 
 const (
@@ -21,80 +17,80 @@ const (
 )
 
 // Creates a new configuration resource to activate time synchronization service.
-func HandleCreateIndividualTimeSynchronizationExposureConfiguration(request *httpwrapper.Request) *httpwrapper.Response {
-	logger.TimeSyncCfgLog.Infoln("Handle Create Individual Time Synchronization Exposure Configuration")
+// func HandleCreateIndividualTimeSynchronizationExposureConfiguration(request *httpwrapper.Request) *httpwrapper.Response {
+// 	logger.TimeSyncCfgLog.Infoln("Handle Create Individual Time Synchronization Exposure Configuration")
 
-	newTimeSyncExpoxeCfg := request.Body.(models.TimeSyncExposureConfig)
-	subscriptionID := request.Params["subscriptionId"]
-	url, problemDetails := TimeSyncExpoCfgCreateProcedure(newTimeSyncExpoxeCfg, subscriptionID)
-	header := http.Header{
-		"Location": {url},
-	}
-	if problemDetails != nil {
-		return httpwrapper.NewResponse(int(problemDetails.Status), nil, problemDetails)
-	} else {
-		return httpwrapper.NewResponse(http.StatusCreated, header, newTimeSyncExpoxeCfg)
-	}
-}
+// 	newTimeSyncExpoxeCfg := request.Body.(models.TimeSyncExposureConfig)
+// 	subscriptionID := request.Params["subscriptionId"]
+// 	url, problemDetails := TimeSyncExpoCfgCreateProcedure(newTimeSyncExpoxeCfg, subscriptionID)
+// 	header := http.Header{
+// 		"Location": {url},
+// 	}
+// 	if problemDetails != nil {
+// 		return httpwrapper.NewResponse(int(problemDetails.Status), nil, problemDetails)
+// 	} else {
+// 		return httpwrapper.NewResponse(http.StatusCreated, header, newTimeSyncExpoxeCfg)
+// 	}
+// }
 
-func TimeSyncExpoCfgCreateProcedure(timeSyncExpoCfg models.TimeSyncExposureConfig, subscriptionID string) (string, *models.ProblemDetails) {
-	logger.TimeSyncCfgLog.Infof("PTP instance type : %v", timeSyncExpoCfg.ReqPtpIns.InstanceType)
-	logger.TimeSyncCfgLog.Infof("Transport protocol : %v", timeSyncExpoCfg.ReqPtpIns.Protocol)
-	logger.TimeSyncCfgLog.Infof("PTP Profile : %v", timeSyncExpoCfg.ReqPtpIns.PtpProfile)
-	logger.TimeSyncCfgLog.Infof("Grandmaster enabled : %v", timeSyncExpoCfg.GmEnable)
-	// logger.TimeSyncCfgLog.Infof("Grandmaster priority :")
-	logger.TimeSyncCfgLog.Infof("Time Domain : %v", timeSyncExpoCfg.TimeDom)
-	logger.TimeSyncCfgLog.Infof("UE identity (for a DS-TT port) : %v", timeSyncExpoCfg.ReqPtpIns.PortConfigs[0].Supi)
+// func TimeSyncExpoCfgCreateProcedure(timeSyncExpoCfg models.TimeSyncExposureConfig, subscriptionID string) (string, *models.ProblemDetails) {
+// 	logger.TimeSyncCfgLog.Infof("PTP instance type : %v", timeSyncExpoCfg.ReqPtpIns.InstanceType)
+// 	logger.TimeSyncCfgLog.Infof("Transport protocol : %v", timeSyncExpoCfg.ReqPtpIns.Protocol)
+// 	logger.TimeSyncCfgLog.Infof("PTP Profile : %v", timeSyncExpoCfg.ReqPtpIns.PtpProfile)
+// 	logger.TimeSyncCfgLog.Infof("Grandmaster enabled : %v", timeSyncExpoCfg.GmEnable)
+// 	// logger.TimeSyncCfgLog.Infof("Grandmaster priority :")
+// 	logger.TimeSyncCfgLog.Infof("Time Domain : %v", timeSyncExpoCfg.TimeDom)
+// 	logger.TimeSyncCfgLog.Infof("UE identity (for a DS-TT port) : %v", timeSyncExpoCfg.ReqPtpIns.PortConfigs[0].Supi)
 
-	for i, subscription := range factory.TsctsfConfig.Subscriptions {
-		if subscription.SubscriptionId == subscriptionID {
-			// create a new configuration
-			newConfigID, err := getUnusedConfigID()
-			if err != nil {
-				logger.TimeSyncCfgLog.Warnf(err.Error())
+// 	for i, subscription := range factory.TsctsfConfig.Subscriptions {
+// 		if subscription.SubscriptionId == subscriptionID {
+// 			// create a new configuration
+// 			newConfigID, err := getUnusedConfigID()
+// 			if err != nil {
+// 				logger.TimeSyncCfgLog.Warnf(err.Error())
 
-				problemDetails := models.ProblemDetails{
-					Title:  "Unsupported request resources",
-					Status: http.StatusNotFound,
-					Detail: err.Error(),
-				}
-				return "", &problemDetails
-			}
-			if subscription.ConfigurationId == "" && subscription.SubscriptionCfg == nil {
-				factory.TsctsfConfig.Subscriptions[i].ConfigurationId = newConfigID
-				factory.TsctsfConfig.Subscriptions[i].SubscriptionCfg = &timeSyncExpoCfg
-			}
-			appsessID, exist := getAppSessIDBySubscID(subscriptionID)
-			if !exist {
-				//  TODO : problem msg
-				problemDetails := &models.ProblemDetails{
-					Status: http.StatusBadRequest,
-					Cause:  "No App Session exist",
-				}
-				return "", problemDetails
-			}
-			ptpInstanceID := AssigedPTPInstanceID(timeSyncExpoCfg.UpNodeId)
-			umic := util.CreatePTPInstanceListForUMIC(timeSyncExpoCfg, ptpInstanceID)
-			// pmic := util.CreatePTPInstanceListForPMIC(timeSyncExpoCfg, ptpInstanceID, DSTT)
+// 				problemDetails := models.ProblemDetails{
+// 					Title:  "Unsupported request resources",
+// 					Status: http.StatusNotFound,
+// 					Detail: err.Error(),
+// 				}
+// 				return "", &problemDetails
+// 			}
+// 			if subscription.ConfigurationId == "" && subscription.SubscriptionCfg == nil {
+// 				factory.TsctsfConfig.Subscriptions[i].ConfigurationId = newConfigID
+// 				factory.TsctsfConfig.Subscriptions[i].SubscriptionCfg = &timeSyncExpoCfg
+// 			}
+// 			appsessID, exist := getAppSessIDBySubscID(subscriptionID)
+// 			if !exist {
+// 				//  TODO : problem msg
+// 				problemDetails := &models.ProblemDetails{
+// 					Status: http.StatusBadRequest,
+// 					Cause:  "No App Session exist",
+// 				}
+// 				return "", problemDetails
+// 			}
+// 			ptpInstanceID := AssigedPTPInstanceID(timeSyncExpoCfg.UpNodeId)
+// 			umic := util.CreatePTPInstanceListForUMIC(timeSyncExpoCfg, ptpInstanceID)
+// 			// pmic := util.CreatePTPInstanceListForPMIC(timeSyncExpoCfg, ptpInstanceID, DSTT)
 
-			// consumer.AppSessionUpdate_PMIC(pmic, appsessID, DSTT) // DSTT
-			consumer.AppSessionUpdate_UMIC(umic, appsessID)
+// 			// consumer.AppSessionUpdate_PMIC(pmic, appsessID, DSTT) // DSTT
+// 			consumer.AppSessionUpdate_UMIC(umic, appsessID)
 
-			// logger.TimeSyncCfgLog.Debugf("ConfigID[%s] with SubscriptionCfg: %+v", factory.TsctsfConfig.Subscriptions[i].ConfigurationId, factory.TsctsfConfig.Subscriptions[i].SubscriptionCfg)
-			resourceUri := fmt.Sprintf("ntsctsf-time-sync/v1/subscriptions/%s/configuration/%s", subscriptionID, newConfigID)
-			return resourceUri, nil
-		}
-	}
-	logger.TimeSyncCfgLog.Warnf("Update Subscription data of Subscription ID[%s] fail.", subscriptionID)
+// 			// logger.TimeSyncCfgLog.Debugf("ConfigID[%s] with SubscriptionCfg: %+v", factory.TsctsfConfig.Subscriptions[i].ConfigurationId, factory.TsctsfConfig.Subscriptions[i].SubscriptionCfg)
+// 			resourceUri := fmt.Sprintf("ntsctsf-time-sync/v1/subscriptions/%s/configuration/%s", subscriptionID, newConfigID)
+// 			return resourceUri, nil
+// 		}
+// 	}
+// 	logger.TimeSyncCfgLog.Warnf("Update Subscription data of Subscription ID[%s] fail.", subscriptionID)
 
-	//  TODO : problem msg
-	problemDetails := &models.ProblemDetails{
-		Status: http.StatusBadRequest,
-		Cause:  "Malformed request syntax",
-	}
-	return "", problemDetails
+// 	//  TODO : problem msg
+// 	problemDetails := &models.ProblemDetails{
+// 		Status: http.StatusBadRequest,
+// 		Cause:  "Malformed request syntax",
+// 	}
+// 	return "", problemDetails
 
-}
+// }
 
 func getUnusedConfigID() (string, error) {
 	var idx uint32 = 1

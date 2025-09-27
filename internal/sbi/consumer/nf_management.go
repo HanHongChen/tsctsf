@@ -11,8 +11,10 @@ import (
 	"github.com/HanHongChen/tsctsf/internal/logger"
 	"github.com/free5gc/openapi"
 
-	"github.com/HanHongChen/bitbucket-openapi/Nnrf_NFManagement"
-	"github.com/HanHongChen/bitbucket-openapi/models"
+	// "github.com/HanHongChen/bitbucket-openapi/Nnrf_NFManagement"
+	"github.com/HanHongChen/openapi-tsctsf/Nnrf_NFManagement"
+	"github.com/HanHongChen/openapi-tsctsf/models"
+	// github.com/HanHongChen/bitbucket-openapi/models
 )
 
 func BuildNFInstance(tsctsfContext *tsctsf_context.TSCTSFContext) (profile models.NfProfile, err error) {

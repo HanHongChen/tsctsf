@@ -6,7 +6,8 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/HanHongChen/bitbucket-openapi/models"
+	"github.com/HanHongChen/openapi-tsctsf/models"
+	//github.com/HanHongChen/bitbucket-openapi/models
 	"github.com/HanHongChen/tsctsf/internal/logger"
 	"github.com/asaskevich/govalidator"
 )
@@ -27,7 +28,15 @@ type Config struct {
 	Configuration *Configuration `yaml:"configuration" valid:"required"`
 	Subscriptions []Subscription `yaml:"subscriptions,omitempty"`
 	Logger        *Logger        `yaml:"logger" valid:"required"`
+	RouterInfo    []RouterInfo   `yaml:"routerInfo" valid:"required"`
 	sync.RWMutex
+}
+
+type RouterInfo struct {
+	UpNodeId string `yaml:"upNodeId" valid:"required"`
+	UeIp     string `yaml:"ueIp" `
+	Port     int    `yaml:"port"`
+	Mtu      int    `yaml:"mtu"`
 }
 
 func (c *Config) Validate() (bool, error) {
@@ -50,6 +59,7 @@ type Configuration struct {
 	TsctsfName      string   `yaml:"tsctsfName,omitempty" valid:"required, type(string)"`
 	Sbi             *Sbi     `yaml:"sbi,omitempty" valid:"required"`
 	NrfUri          string   `yaml:"nrfUri,omitempty" valid:"required, url"`
+	PcfUri			string   `yaml:"pcfUri,omitempty" valid:"required, url"`
 	ServiceNameList []string `yaml:"serviceNameList,omitempty" valid:"required"`
 }
 
@@ -76,6 +86,7 @@ func (c *Configuration) validate() (bool, error) {
 	for index, serviceName := range c.ServiceNameList {
 		switch {
 		case serviceName == "ntsctsf_timesynchronization":
+		case serviceName == "ntsctsf_qosandtscassistance":
 		default:
 			err := errors.New("Invalid serviceNameList[" + strconv.Itoa(index) + "]: " +
 				serviceName + ", should be ntsctsf_timesynchronization.")

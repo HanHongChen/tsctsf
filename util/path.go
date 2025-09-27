@@ -1,15 +1,19 @@
 package util
 
 import (
+	"fmt"
 	"net/url"
-
-	"github.com/HanHongChen/bitbucket-openapi/Npcf_PolicyAuthorization"
-	"github.com/HanHongChen/bitbucket-openapi/Ntsnaf_BridgeInfoManagement"
+	"path"
+	"github.com/HanHongChen/tsctsf/context"
+	"github.com/HanHongChen/openapi-tsctsf/Npcf_PolicyAuthorization"
+	"github.com/HanHongChen/openapi-tsctsf/Ntsnaf_BridgeInfoManagement"
+	// "github.com/HanHongChen/bitbucket-openapi/Npcf_PolicyAuthorization"
+	// "github.com/HanHongChen/bitbucket-openapi/Ntsnaf_BridgeInfoManagement"
 )
-
-func GetNpcfPolicyAuthorizationClient() *Npcf_PolicyAuthorization.APIClient {
+//this place need to read config to get 
+func GetNpcfPolicyAuthorizationClient(context *tsnContext.PCFContext) *Npcf_PolicyAuthorization.APIClient {
 	configuration := Npcf_PolicyAuthorization.NewConfiguration()
-	configuration.SetBasePath("http://127.0.0.7:8000")
+	configuration.SetBasePath(context.tsnContext.PcfUri)
 	client := Npcf_PolicyAuthorization.NewAPIClient(configuration)
 	return client
 }
@@ -36,4 +40,15 @@ func Split_appSessionId(Loc *url.URL) string {
 		}
 	}
 	return temp[slash:]
+}
+
+func Split_appSessionId_str(Loc string) string {
+	parsedUrl, err := url.Parse(Loc)
+	if err != nil {
+		panic(err)
+	}
+
+	lastSegment := path.Base(parsedUrl.Path)
+	fmt.Println("App Session ID:", lastSegment)
+	return lastSegment
 }

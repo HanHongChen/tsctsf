@@ -11,8 +11,9 @@ import (
 	tsctsf_context "github.com/HanHongChen/tsctsf/internal/context"
 	"github.com/HanHongChen/tsctsf/internal/logger"
 	"github.com/HanHongChen/tsctsf/internal/sbi/consumer"
-	policyauthorization "github.com/HanHongChen/tsctsf/internal/sbi/policyauthorization"
-	timesynchronization "github.com/HanHongChen/tsctsf/internal/sbi/timesynchronization"
+
+	// timesynchronization "github.com/HanHongChen/tsctsf/internal/sbi/timesynchronization"
+	qosandtscassistance "github.com/HanHongChen/tsctsf/internal/sbi/qosandtscassistance"
 	"github.com/HanHongChen/tsctsf/pkg/factory"
 	"github.com/free5gc/util/httpwrapper"
 	logger_util "github.com/free5gc/util/logger"
@@ -90,9 +91,10 @@ func (a *TsctsfApp) Start(tlsKeyLogPath string) {
 	}
 	router := logger_util.NewGinWithLogrus(logger.GinLog)
 
-	policyauthorization.AddService(router)
-	timesynchronization.AddService(router)
+	// policyauthorization.AddService(router)
+	// timesynchronization.AddService(router)
 	// bridgeinfomangement.AddService(router)
+	qosandtscassistance.AddService(router)
 
 	router.Use(cors.New(cors.Config{
 		AllowMethods: []string{"GET", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"},

@@ -9,73 +9,74 @@
 
 package policyauthorization
 
-import (
-	"net/http"
+// import (
+// 	"net/http"
 
-	"github.com/HanHongChen/bitbucket-openapi/models"
-	"github.com/HanHongChen/tsctsf/internal/logger"
-	"github.com/HanHongChen/tsctsf/internal/sbi/producer"
-	"github.com/free5gc/openapi"
-	"github.com/free5gc/util/httpwrapper"
-	"github.com/gin-gonic/gin"
-)
+// 	"github.com/HanHongChen/openapi-tsctsf/models"
+// 	//github.com/HanHongChen/bitbucket-openapi/models
+// 	"github.com/HanHongChen/tsctsf/internal/logger"
+// 	"github.com/HanHongChen/tsctsf/internal/sbi/producer"
+// 	"github.com/free5gc/openapi"
+// 	"github.com/free5gc/util/httpwrapper"
+// 	"github.com/gin-gonic/gin"
+// )
 
-// HTTPPostTsnNewBridge - Receive new bridge of TSN related
-func HTTPPostTsnNewBridge(c *gin.Context) {
-	logger.PolicyAuthLog.Info("Received Detected 5Gs Bridge For Pdu Session")
+// // HTTPPostTsnNewBridge - Receive new bridge of TSN related
+// func HTTPPostTsnNewBridge(c *gin.Context) {
+// 	logger.PolicyAuthLog.Info("Received Detected 5Gs Bridge For Pdu Session")
 
-	var pduSessionTsnBridge models.PduSessionTsnBridge
-	// step 1: retrieve http request body
-	requestBody, err := c.GetRawData()
-	if err != nil {
-		problemDetail := models.ProblemDetails{
-			Title:  "System failure",
-			Status: http.StatusInternalServerError,
-			Detail: err.Error(),
-			Cause:  "SYSTEM_FAILURE",
-		}
-		logger.PolicyAuthLog.Errorf("Get Request Body error: %+v", err)
-		c.JSON(http.StatusInternalServerError, problemDetail)
-		return
-	}
+// 	var pduSessionTsnBridge models.PduSessionTsnBridge
+// 	// step 1: retrieve http request body
+// 	requestBody, err := c.GetRawData()
+// 	if err != nil {
+// 		problemDetail := models.ProblemDetails{
+// 			Title:  "System failure",
+// 			Status: http.StatusInternalServerError,
+// 			Detail: err.Error(),
+// 			Cause:  "SYSTEM_FAILURE",
+// 		}
+// 		logger.PolicyAuthLog.Errorf("Get Request Body error: %+v", err)
+// 		c.JSON(http.StatusInternalServerError, problemDetail)
+// 		return
+// 	}
 
-	// step 2: convert requestBody to openapi models
-	err = openapi.Deserialize(&pduSessionTsnBridge, requestBody, "application/json")
-	if err != nil {
-		problemDetail := "[Request Body] " + err.Error()
-		rsp := models.ProblemDetails{
-			Title:  "Malformed request syntax",
-			Status: http.StatusBadRequest,
-			Detail: problemDetail,
-		}
-		logger.PolicyAuthLog.Errorln(problemDetail)
-		c.JSON(http.StatusBadRequest, rsp)
-		return
-	}
+// 	// step 2: convert requestBody to openapi models
+// 	err = openapi.Deserialize(&pduSessionTsnBridge, requestBody, "application/json")
+// 	if err != nil {
+// 		problemDetail := "[Request Body] " + err.Error()
+// 		rsp := models.ProblemDetails{
+// 			Title:  "Malformed request syntax",
+// 			Status: http.StatusBadRequest,
+// 			Detail: problemDetail,
+// 		}
+// 		logger.PolicyAuthLog.Errorln(problemDetail)
+// 		c.JSON(http.StatusBadRequest, rsp)
+// 		return
+// 	}
 
-	// step3 : handle request
-	req := httpwrapper.NewRequest(c.Request, pduSessionTsnBridge)
-	rsp := producer.HandleNotification5GSBridgeInfoRequest(req)
+// 	// step3 : handle request
+// 	req := httpwrapper.NewRequest(c.Request, pduSessionTsnBridge)
+// 	rsp := producer.HandleNotification5GSBridgeInfoRequest(req)
 
-	// step4 : response
-	for key, val := range rsp.Header {
-		c.Header(key, val[0])
-	}
-	responseBody, err := openapi.Serialize(rsp.Body, "application/json")
-	if err != nil {
-		logger.PolicyAuthLog.Errorln(err)
-		problemDetails := models.ProblemDetails{
-			Status: http.StatusInternalServerError,
-			Cause:  "SYSTEM_FAILURE",
-			Detail: err.Error(),
-		}
-		c.JSON(http.StatusInternalServerError, problemDetails)
-	} else {
-		c.Data(rsp.Status, "application/json", responseBody)
-	}
+// 	// step4 : response
+// 	for key, val := range rsp.Header {
+// 		c.Header(key, val[0])
+// 	}
+// 	responseBody, err := openapi.Serialize(rsp.Body, "application/json")
+// 	if err != nil {
+// 		logger.PolicyAuthLog.Errorln(err)
+// 		problemDetails := models.ProblemDetails{
+// 			Status: http.StatusInternalServerError,
+// 			Cause:  "SYSTEM_FAILURE",
+// 			Detail: err.Error(),
+// 		}
+// 		c.JSON(http.StatusInternalServerError, problemDetails)
+// 	} else {
+// 		c.Data(rsp.Status, "application/json", responseBody)
+// 	}
 
-	// if new == true {
-	// 	tsn_self := tsnaf_context.TSNAF_Self()
-	// 	consumer.HandleAppSessionCreate(tsn_self.Tsn_bridge)
-	// }
-}
+// 	// if new == true {
+// 	// 	tsn_self := tsnaf_context.TSNAF_Self()
+// 	// 	consumer.HandleAppSessionCreate(tsn_self.Tsn_bridge)
+// 	// }
+// }
