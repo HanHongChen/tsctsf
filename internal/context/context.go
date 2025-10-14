@@ -9,7 +9,6 @@ import (
 	"sync"
 
 	"github.com/HanHongChen/openapi-tsctsf/models"
-	//github.com/HanHongChen/bitbucket-openapi/models
 	"github.com/HanHongChen/tsctsf/internal/logger"
 	"github.com/HanHongChen/tsctsf/pkg/factory"
 	"github.com/google/uuid"
@@ -70,6 +69,7 @@ func Init() {
 	for _, router := range routers {
 		tsnContext.Routers[router.UpNodeId] = RouterInfo{
 			UpNodeId: router.UpNodeId,
+			MacAddr:  router.MacAddr,
 			UeIp:     router.UeIp,
 			Port:     router.Port,
 			Mtu:      router.Mtu,
@@ -77,6 +77,21 @@ func Init() {
 		fmt.Println(router)
 	}
 
+	detnetController := config.DetNetController
+	if detnetController == (factory.DetNetController{}) {
+		logger.InitLog.Warn("DetNetController is not configured")
+	} else {
+		tsnContext.DetNetController = DetNetController{
+			Scheme:   detnetController.Scheme,
+			IPv4:     detnetController.IPv4,
+			Port:     detnetController.Port,
+			User:     detnetController.User,
+			Password: detnetController.Password,
+			Uri:      detnetController.Uri,
+		}
+		logger.InitLog.Infof("DetNetController Info: Scheme[%s] IPv4[%s] Port[%d] User[%s] Uri[%s]\n",
+			detnetController.Scheme, detnetController.IPv4, detnetController.Port, detnetController.User, detnetController.Uri)
+	}
 }
 
 func (context *TSCTSFContext) InitNFService(srvNameList []string, version string) {
@@ -120,15 +135,26 @@ type TSCTSFContext struct {
 	Bridges          map[uint64]Bridge_info // key is Bridge_ID
 	SubscripSession  map[string]string      // key is Session_ID
 	Routers          map[string]RouterInfo
-	PcfUri			 string
+	DetNetController DetNetController
+	PcfUri           string
 	// NwttIndex        map[int]int
 }
 
 type RouterInfo struct {
 	UpNodeId string
+	MacAddr  string
 	UeIp     string
 	Port     int
 	Mtu      int
+}
+
+type DetNetController struct {
+	Scheme   string
+	IPv4     string
+	Port     int
+	User     string
+	Password string
+	Uri      string
 }
 
 type Bridge_info struct {

@@ -4,16 +4,17 @@ import (
 	"fmt"
 	"net/url"
 	"path"
-	"github.com/HanHongChen/tsctsf/context"
+	"github.com/HanHongChen/tsctsf/internal/context"
 	"github.com/HanHongChen/openapi-tsctsf/Npcf_PolicyAuthorization"
 	"github.com/HanHongChen/openapi-tsctsf/Ntsnaf_BridgeInfoManagement"
 	// "github.com/HanHongChen/bitbucket-openapi/Npcf_PolicyAuthorization"
 	// "github.com/HanHongChen/bitbucket-openapi/Ntsnaf_BridgeInfoManagement"
 )
 //this place need to read config to get 
-func GetNpcfPolicyAuthorizationClient(context *tsnContext.PCFContext) *Npcf_PolicyAuthorization.APIClient {
+func GetNpcfPolicyAuthorizationClient() *Npcf_PolicyAuthorization.APIClient {
 	configuration := Npcf_PolicyAuthorization.NewConfiguration()
-	configuration.SetBasePath(context.tsnContext.PcfUri)
+	fmt.Println("PcfUri = " + context.GetSelf().PcfUri)
+	configuration.SetBasePath(context.GetSelf().PcfUri)
 	client := Npcf_PolicyAuthorization.NewAPIClient(configuration)
 	return client
 }

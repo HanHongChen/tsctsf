@@ -12,7 +12,6 @@ import (
 	"github.com/HanHongChen/tsctsf/internal/logger"
 	"github.com/HanHongChen/tsctsf/internal/sbi/consumer"
 
-	// timesynchronization "github.com/HanHongChen/tsctsf/internal/sbi/timesynchronization"
 	qosandtscassistance "github.com/HanHongChen/tsctsf/internal/sbi/qosandtscassistance"
 	"github.com/HanHongChen/tsctsf/pkg/factory"
 	"github.com/free5gc/util/httpwrapper"
@@ -155,6 +154,8 @@ func (a *TsctsfApp) Start(tlsKeyLogPath string) {
 	if err != nil {
 		logger.InitLog.Fatalf("HTTP server setup failed: %+v", err)
 	}
+	logger.InitLog.Infoln("exec consumer.SendToDetNetController")
+	consumer.SendToDetNetController()
 }
 
 func (a *TsctsfApp) Terminate() {

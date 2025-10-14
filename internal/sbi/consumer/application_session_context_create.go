@@ -67,7 +67,7 @@ func HandleDetNetAppSessionCreate(new_detnet PduSessionDetNet) (resp PostTSCAppS
 	parsedDlTime, err := time.Parse(layout, dlTimeStr)
 
 	medComp := tsctsf_models.MediaComponent{
-		AfAppId:  "vr",
+		// AfAppId:  "vr",
 		MedCompN: 1,
 		TsnQos: &tsctsf_models.TsnQosContainer{
 			TscPackDelay:    10,
@@ -135,7 +135,7 @@ func HandleDetNetAppSessionCreate(new_detnet PduSessionDetNet) (resp PostTSCAppS
 	// TODO : the conditions to match for notifying the event within the "eventFilters" attribute;
 	_, exist := tsctsf_self.AppSessionIdPool.Load(new_detnet.UeIpv4Addr)
 	if !exist {
-		logger.PolicyAuthLog.Infof("Store New AF-session ID :[%d] with DNN/S-NSSAI :[%s]", appSessID, new_detnet.UeIpv4Addr)
+		logger.PolicyAuthLog.Warnf("Store New AF-session ID :[%d] with DNN/S-NSSAI :[%s]", appSessID, new_detnet.UeIpv4Addr)
 		tsctsf_self.AppSessionIdPool.Store(new_detnet.UeIpv4Addr, appSessID)
 
 	}
