@@ -134,6 +134,10 @@ func (a *TsctsfApp) Start(tlsKeyLogPath string) {
 		os.Exit(0)
 	}()
 
+	logger.InitLog.Infoln("exec consumer.SendToDetNetController")
+	consumer.SendToDetNetController()
+
+
 	HTTPAddr := fmt.Sprintf("%s:%d", factory.TsctsfConfig.Configuration.Sbi.BindingIPv4, factory.TsctsfConfig.Configuration.Sbi.Port)
 	server, err := httpwrapper.NewHttp2Server(HTTPAddr, tlsKeyLogPath, router)
 	if server == nil {
@@ -154,8 +158,6 @@ func (a *TsctsfApp) Start(tlsKeyLogPath string) {
 	if err != nil {
 		logger.InitLog.Fatalf("HTTP server setup failed: %+v", err)
 	}
-	logger.InitLog.Infoln("exec consumer.SendToDetNetController")
-	consumer.SendToDetNetController()
 }
 
 func (a *TsctsfApp) Terminate() {
